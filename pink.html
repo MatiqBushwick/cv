@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PINK - Параллакс-скроллинг</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a0a1a 0%, #0a1a1a 50%, #0a0a2e 100%);
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+            perspective: 1px;
+            transform-style: preserve-3d;
+        }
+        
+        #background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .pink-element {
+            position: absolute;
+            font-family: 'Arial', sans-serif;
+            font-weight: 800;
+            text-anchor: middle;
+            pointer-events: none;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1;
+            will-change: transform;
+        }
+        
+        .content {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            z-index: 10;
+            transform-style: preserve-3d;
+        }
+        
+        header {
+            text-align: center;
+            padding: 80px 0 60px;
+            margin-bottom: 50px;
+        }
+        
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, #ff69b4, #40e0d0, #ff69b4);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s linear infinite;
+        }
+        
+        .pink-title {
+            font-size: 5rem;
+            color: #ff69b4;
+            text-shadow: 0 0 20px rgba(255, 105, 180, 0.6);
+            margin-bottom: 30px;
+            animation: pulse 2s infinite alternate;
+        }
+        
+        .subtitle {
+            font-size: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            color: #d0f0f0;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+        
+        .feature-card {
+            background: rgba(26, 10, 26, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 20;
+            transform: translateZ(0);
+        }
+        
+        .feature-card::before {
+            content: "PINK";
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 80px;
+            font-weight: 900;
+            opacity: 0.05;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 105, 180, 0.2);
+            z-index: -1;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(255, 105, 180, 0.3);
+            border-color: rgba(64, 224, 208, 0.4);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #ff69b4;
+        }
+        
+        .feature-card p {
+            color: #d0f0f0;
+            line-height: 1.6;
+        }
+        
+        .cta {
+            text-align: center;
+            margin: 60px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(90deg, #ff69b4, #40e0d0);
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(255, 105, 180, 0.3);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 20;
+        }
+        
+        .btn::before {
+            content: "PINK";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            font-weight: 900;
+            opacity: 0.1;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+            z-index: -1;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(64, 224, 208, 0.4);
+            background: linear-gradient(90deg, #40e0d0, #ff69b4);
+        }
+        
+        .scroll-content {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 30px;
+            background: rgba(26, 10, 26, 0.7);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            line-height: 1.8;
+            transform: translateZ(0);
+        }
+        
+        .scroll-content h2 {
+            color: #ff69b4;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+        }
+        
+        .scroll-content p {
+            margin-bottom: 20px;
+        }
+        
+        .parallax-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            text-align: center;
+            margin: 100px 0;
+            background: rgba(10, 10, 30, 0.4);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 105, 180, 0.2);
+        }
+        
+        .parallax-title {
+            font-size: 3.5rem;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, #ff69b4, #40e0d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+            border-top: 1px solid rgba(255, 105, 180, 0.2);
+            color: #d0a0b0;
+            position: relative;
+        }
+        
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            color: #ff69b4;
+            text-align: center;
+            z-index: 100;
+            background: rgba(26, 10, 26, 0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 105, 180, 0.3);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); text-shadow: 0 0 10px rgba(255, 105, 180, 0.5); }
+            100% { transform: scale(1.05); text-shadow: 0 0 30px rgba(255, 105, 180, 0.8); }
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-20px); }
+            60% { transform: translateX(-50%) translateY(-10px); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .pink-title {
+                font-size: 3.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .parallax-title {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background-container"></div>
+    
+    <div class="content">
+        <header>
+            <div class="pink-title">PINK</div>
+            <h1>Параллакс-скроллинг с эффектом глубины</h1>
+            <p class="subtitle">Элементы с текстом "PINK" плавно двигаются при прокрутке страницы, создавая эффект глубины и объемности. Попробуйте прокрутить страницу вниз!</p>
+        </header>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>Параллакс-эффект</h3>
+                <p>Элементы фона двигаются с разной скоростью, создавая ощущение глубины и объема при прокрутке страницы.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Плавная анимация</h3>
+                <p>Элементы "PINK" плавно перемещаются с использованием современных CSS-переходов и JavaScript-анимаций.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Розово-бирюзовая тема</h3>
+                <p>Стильная цветовая схема с градиентами от розового (#ff69b4) к бирюзовому (#40e0d0).</p>
+            </div>
+        </div>
+        
+        <div class="cta">
+            <a href="#" class="btn">Кликабельная кнопка</a>
+        </div>
+        
+        <div class="scroll-content">
+            <h2>Прокручиваемый контент</h2>
+            <p>Прокручивайте страницу, чтобы увидеть параллакс-эффект в действии. Элементы фона будут двигаться с разной скоростью, создавая иллюзию глубины.</p>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl. Nullam auctor, nisl eget ultricies tincidunt, nisl nisl aliquam nisl, eget ultricies nisl nisl eget nisl.</p>
+            <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
+        </div>
+        
+        <div class="parallax-section">
+            <h2 class="parallax-title">Эффект глубины</h2>
+            <p>Элементы переднего плана двигаются быстрее, а элементы фона - медленнее, создавая ощущение трехмерного пространства.</p>
+        </div>
+        
+        <div class="scroll-content">
+            <h2>Технологии</h2>
+            <p>Параллакс-эффект реализован с помощью комбинации CSS-трансформаций и JavaScript-анимаций, что обеспечивает плавность и производительность.</p>
+            <p>Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis.</p>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>Адаптивный дизайн</h3>
+                <p>Страница отлично выглядит на всех устройствах - от мобильных телефонов до настольных компьютеров.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Производительность</h3>
+                <p>Оптимизированный код обеспечивает плавную анимацию без замедления работы страницы.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Эффект пульсации</h3>
+                <p>Заголовок "PINK" пульсирует с легкой анимацией, привлекая внимание к бренду.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Прокручивайте страницу, чтобы увидеть параллакс-эффект элементов "PINK"</p>
+            <p>&copy; 2023 Параллакс-скроллинг "PINK". Все права защищены.</p>
+        </footer>
+    </div>
+    
+    <div class="scroll-indicator">Прокрутите вниз</div>
+
+    <script>
+        // Создание элементов PINK
+        const container = document.getElementById('background-container');
+        const elements = [];
+        const elementCount = 50;
+        
+        // Генерация элементов
+        for (let i = 0; i < elementCount; i++) {
+            const element = document.createElement('div');
+            element.classList.add('pink-element');
+            element.textContent = 'PINK';
+            
+            // Случайные параметры
+            const size = 20 + Math.random() * 40;
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const opacity = 0.2 + Math.random() * 0.3;
+            const rotation = Math.random() * 360;
+            const depth = 0.1 + Math.random() * 0.9; // Глубина для параллакс-эффекта
+            
+            const colorVariance = Math.random() > 0.5 ? 
+                `rgba(255, 105, 180, ${opacity})` : 
+                `rgba(64, 224, 208, ${opacity})`;
+            
+            // Применение стилей
+            element.style.fontSize = `${size}px`;
+            element.style.left = `${x}%`;
+            element.style.top = `${y}%`;
+            element.style.color = colorVariance;
+            element.style.transform = `rotate(${rotation}deg)`;
+            element.style.filter = `blur(${Math.random() * 2}px)`;
+            element.style.zIndex = Math.floor(depth * 10);
+            element.style.willChange = 'transform';
+            
+            // Сохраняем параметры для параллакс-эффекта
+            element.originalX = x;
+            element.originalY = y;
+            element.depth = depth;
+            element.floatOffsetX = (Math.random() - 0.5) * 20;
+            element.floatOffsetY = (Math.random() - 0.5) * 20;
+            
+            container.appendChild(element);
+            elements.push(element);
+        }
+        
+        // Настройки параллакса
+        const maxParallaxOffset = 100;
+        let scrollPosition = 0;
+        
+        // Обработка прокрутки страницы
+        function handleScroll() {
+            scrollPosition = window.scrollY;
+            updateParallax();
+        }
+        
+        // Обновление позиций элементов
+        function updateParallax() {
+            elements.forEach(element => {
+                // Вычисляем смещение на основе глубины
+                const offsetX = element.floatOffsetX * Math.sin(scrollPosition / 500);
+                const offsetY = element.floatOffsetY * Math.cos(scrollPosition / 500);
+                const parallaxY = scrollPosition * (1 - element.depth) * 0.5;
+                
+                // Применяем трансформации
+                element.style.transform = `translate(0, ${-parallaxY}px) translate(${offsetX}px, ${offsetY}px) rotate(${element.style.transform.match(/rotate\(([^)]+)\)/)[1]}`;
+            });
+        }
+        
+        // Инициализация плавающего эффекта
+        function animateElements() {
+            elements.forEach(element => {
+                const time = Date.now() * 0.0005;
+                const floatX = Math.sin(time + element.originalX * 0.1) * 10;
+                const floatY = Math.cos(time + element.originalY * 0.1) * 10;
+                
+                element.floatOffsetX = floatX;
+                element.floatOffsetY = floatY;
+            });
+            
+            updateParallax();
+            requestAnimationFrame(animateElements);
+        }
+        
+        // Запуск анимации
+        animateElements();
+        
+        // Обработчик прокрутки
+        window.addEventListener('scroll', handleScroll);
+        
+        // Обновление при изменении размера окна
+        window.addEventListener('resize', () => {
+            elements.forEach(element => {
+                element.style.left = `${element.originalX}%`;
+                element.style.top = `${element.originalY}%`;
+            });
+        });
+        
+        // Скрываем индикатор прокрутки при скролле
+        const scrollIndicator = document.querySelector('.scroll-indicator');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                scrollIndicator.style.opacity = '0';
+                scrollIndicator.style.visibility = 'hidden';
+            } else {
+                scrollIndicator.style.opacity = '1';
+                scrollIndicator.style.visibility = 'visible';
+            }
+        });
+    </script>
+</body>
+</html>

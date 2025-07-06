@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KOKA - Динамический Текстовый Фон</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: #fff;
+            position: relative;
+        }
+        
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+        
+        .text-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 200%;
+            opacity: 0.1;
+            background-image: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 40px,
+                rgba(255, 255, 255, 0.1) 40px,
+                rgba(255, 255, 255, 0.1) 80px
+            );
+            animation: move 60s linear infinite;
+        }
+        
+        .text-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+        }
+        
+        .koka-text {
+            font-size: 24px;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.05);
+            margin: 0 15px;
+            animation: float 15s infinite ease-in-out;
+            text-shadow: 0 0 10px rgba(100, 200, 255, 0.1);
+            transform-origin: center;
+            transition: all 0.5s ease;
+        }
+        
+        .layer-1 {
+            animation-duration: 60s;
+        }
+        
+        .layer-2 {
+            animation-duration: 40s;
+            animation-direction: reverse;
+        }
+        
+        .layer-3 {
+            animation-duration: 30s;
+        }
+        
+        .floating-texts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .floating-koka {
+            position: absolute;
+            font-size: 120px;
+            font-weight: 900;
+            opacity: 0.08;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(100, 200, 255, 0.2);
+            animation: float 15s infinite ease-in-out;
+            z-index: -1;
+        }
+        
+        .floating-koka:nth-child(1) {
+            top: 15%;
+            left: 10%;
+            animation-delay: 0s;
+            font-size: 180px;
+        }
+        
+        .floating-koka:nth-child(2) {
+            top: 25%;
+            right: 15%;
+            animation-delay: -2s;
+            font-size: 150px;
+        }
+        
+        .floating-koka:nth-child(3) {
+            bottom: 20%;
+            left: 20%;
+            animation-delay: -5s;
+            font-size: 200px;
+        }
+        
+        .floating-koka:nth-child(4) {
+            bottom: 30%;
+            right: 25%;
+            animation-delay: -7s;
+            font-size: 130px;
+        }
+        
+        .content {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            z-index: 1;
+        }
+        
+        header {
+            text-align: center;
+            padding: 60px 0;
+            margin-bottom: 50px;
+        }
+        
+        h1 {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(0, 200, 255, 0.5);
+            background: linear-gradient(90deg, #00c6ff, #0072ff, #00c6ff);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient 3s linear infinite;
+        }
+        
+        .koka-title {
+            font-size: 7rem;
+            letter-spacing: 10px;
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(100, 200, 255, 0.3);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            animation: pulse 4s infinite alternate;
+        }
+        
+        .subtitle {
+            font-size: 1.8rem;
+            max-width: 800px;
+            margin: 0 auto 40px;
+            color: #a0d2ff;
+            font-weight: 300;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 60px 0;
+        }
+        
+        .feature-card {
+            background: rgba(10, 25, 47, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 200, 255, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card::before {
+            content: "KOKA";
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            font-size: 80px;
+            font-weight: 900;
+            opacity: 0.05;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.1);
+            z-index: -1;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 100, 200, 0.3);
+            border-color: rgba(100, 200, 255, 0.4);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #4dc7ff;
+        }
+        
+        .feature-card p {
+            color: #c0e4ff;
+            line-height: 1.6;
+        }
+        
+        .cta {
+            text-align: center;
+            margin: 60px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(90deg, #0072ff, #00c6ff);
+            color: white;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 114, 255, 0.3);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn::before {
+            content: "KOKA";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            font-weight: 900;
+            opacity: 0.1;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.2);
+            z-index: -1;
+        }
+        
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 114, 255, 0.4);
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 60px;
+            border-top: 1px solid rgba(100, 200, 255, 0.2);
+            color: #8ab3cf;
+            position: relative;
+        }
+        
+        footer::after {
+            content: "KOKA";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 100px;
+            font-weight: 900;
+            opacity: 0.02;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.05);
+            z-index: -1;
+        }
+        
+        @keyframes move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-50%, -50%); }
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            25% { transform: translate(20px, -20px) rotate(5deg) scale(1.05); }
+            50% { transform: translate(0, -30px) rotate(0deg) scale(1.1); }
+            75% { transform: translate(-20px, -20px) rotate(-5deg) scale(1.05); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+        
+        @keyframes pulse {
+            0% { text-shadow: 0 0 5px rgba(100, 200, 255, 0.2); }
+            100% { text-shadow: 0 0 20px rgba(100, 200, 255, 0.4); }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+            
+            .koka-title {
+                font-size: 4rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .floating-koka {
+                font-size: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-container">
+        <div class="text-pattern layer-1"></div>
+        <div class="text-pattern layer-2"></div>
+        <div class="text-pattern layer-3"></div>
+        
+        <div class="text-layer">
+            <!-- KOKA text pattern will be generated by JS -->
+        </div>
+        
+        <div class="floating-texts">
+            <div class="floating-koka">KOKA</div>
+            <div class="floating-koka">KOKA</div>
+            <div class="floating-koka">KOKA</div>
+            <div class="floating-koka">KOKA</div>
+        </div>
+    </div>
+    
+    <div class="content">
+        <header>
+            <div class="koka-title">KOKA</div>
+            <h1>Динамический Текстовый Фон</h1>
+            <p class="subtitle">Создайте уникальный визуальный опыт с анимированным текстовым фоном. Идеально для брендинга и креативных проектов.</p>
+        </header>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>Современный Дизайн</h3>
+                <p>Анимированный текст создаёт глубину и движение, превращая статичный фон в динамическое произведение искусства.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Адаптивность</h3>
+                <p>Фон идеально масштабируется под любые устройства - от мобильных телефонов до 4K мониторов.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Производительность</h3>
+                <p>Оптимизированные CSS-анимации обеспечивают плавность без нагрузки на процессор.</p>
+            </div>
+        </div>
+        
+        <div class="cta">
+            <a href="#" class="btn">Начать Проект</a>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card">
+                <h3>Кастомизация</h3>
+                <p>Легко меняйте текст, цвета, скорость анимации и другие параметры под ваши нужды.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Брендинг</h3>
+                <p>Усильте узнаваемость бренда с помощью повторяющегося фирменного текста.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Креативность</h3>
+                <p>Откройте новые возможности для творческого выражения на вашем сайте.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2023 Динамический Текстовый Фон. Все права защищены.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Generate KOKA text pattern
+        const textLayer = document.querySelector('.text-layer');
+        const kokaCount = 150; // Number of KOKA elements
+        
+        for (let i = 0; i < kokaCount; i++) {
+            const koka = document.createElement('div');
+            koka.className = 'koka-text';
+            koka.textContent = 'KOKA';
+            
+            // Randomize properties
+            const size = 12 + Math.random() * 20;
+            const opacity = 0.03 + Math.random() * 0.07;
+            const delay = Math.random() * 15;
+            
+            koka.style.fontSize = `${size}px`;
+            koka.style.opacity = opacity;
+            koka.style.animationDelay = `${delay}s`;
+            koka.style.animationDuration = `${15 + Math.random() * 30}s`;
+            
+            textLayer.appendChild(koka);
+        }
+        
+        // Add interactive effect
+        document.addEventListener('mousemove', (e) => {
+            const floatingTexts = document.querySelectorAll('.floating-koka');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            floatingTexts.forEach((text, index) => {
+                const moveX = (x - 0.5) * 50;
+                const moveY = (y - 0.5) * 50;
+                const rotate = (x - 0.5) * 10;
+                
+                text.style.transform = `translate(${moveX}px, ${moveY}px) rotate(${rotate}deg)`;
+            });
+        });
+    </script>
+</body>
+</html>
